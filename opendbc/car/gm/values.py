@@ -32,7 +32,13 @@ class CarControllerParams:
   ACCEL_MAX = 2.  # m/s^2
   ACCEL_MIN = -4.  # m/s^2
 
+  HEAVY_TRUCK_CAR = set()  # populated after CAR class is defined
+
   def __init__(self, CP):
+    if CP.carFingerprint in self.HEAVY_TRUCK_CAR:
+      self.STEER_MAX = 400
+      self.STEER_DELTA_UP = 15
+      self.STEER_DELTA_DOWN = 25
     # Gas/brake lookups
     self.ZERO_GAS = 2048  # Coasting
     self.MAX_BRAKE = 400  # ~ -4.0 m/s^2 with regen
@@ -184,7 +190,11 @@ class CAR(Platforms):
   )
   GMC_YUKON = GMPlatformConfig(
     [GMCarDocs("GMC Yukon 2019-20", "Adaptive Cruise Control (ACC) & LKAS")],
-    GMCarSpecs(mass=2490, wheelbase=2.95, steerRatio=17.3, centerToFrontRatio=0.5, tireStiffnessFactor=0.5),
+    GMCarSpecs(mass=2490, wheelbase=2.95, steerRatio=17.3, centerToFrontRatio=0.5, tireStiffnessFactor=1.0),
+  )
+  CHEVROLET_SUBURBAN = GMPlatformConfig(
+    [GMCarDocs("Chevrolet Suburban 2015-20", "Adaptive Cruise Control (ACC) & LKAS")],
+    GMCarSpecs(mass=2607, wheelbase=3.302, steerRatio=17.3, centerToFrontRatio=0.4, tireStiffnessFactor=1.0),
   )
 
 
@@ -264,13 +274,15 @@ FW_QUERY_CONFIG = FwQueryConfig(
 EV_CAR = {CAR.CHEVROLET_VOLT, CAR.CHEVROLET_VOLT_2019, CAR.CHEVROLET_BOLT_EUV}
 
 # We're integrated at the camera with VOACC on these cars (instead of ASCM w/ OBD-II harness)
-CAMERA_ACC_CAR = {CAR.CHEVROLET_BOLT_EUV, CAR.CHEVROLET_SILVERADO, CAR.CHEVROLET_EQUINOX, CAR.CHEVROLET_TRAILBLAZER, CAR.GMC_YUKON}
+CAMERA_ACC_CAR = {CAR.CHEVROLET_BOLT_EUV, CAR.CHEVROLET_SILVERADO, CAR.CHEVROLET_EQUINOX, CAR.CHEVROLET_TRAILBLAZER, CAR.GMC_YUKON, CAR.CHEVROLET_SUBURBAN}
 
 # Alt ASCMActiveCruiseControlStatus
-ALT_ACCS = {CAR.GMC_YUKON}
+ALT_ACCS = {CAR.GMC_YUKON, CAR.CHEVROLET_SUBURBAN}
 
 # We're integrated at the Safety Data Gateway Module on these cars
 SDGM_CAR = {CAR.CADILLAC_XT4, CAR.CHEVROLET_VOLT_2019, CAR.CHEVROLET_TRAVERSE}
+
+CarControllerParams.HEAVY_TRUCK_CAR = {CAR.GMC_YUKON, CAR.CHEVROLET_SUBURBAN, CAR.CADILLAC_ESCALADE, CAR.CADILLAC_ESCALADE_ESV, CAR.CADILLAC_ESCALADE_ESV_2019}
 
 STEER_THRESHOLD = 1.0
 
