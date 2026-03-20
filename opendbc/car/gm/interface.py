@@ -8,6 +8,7 @@ from opendbc.car.common.conversions import Conversions as CV
 from opendbc.car.gm.radar_interface import RADAR_HEADER_MSG
 from opendbc.car.gm.values import CAR, CarControllerParams, EV_CAR, CAMERA_ACC_CAR, SDGM_CAR, ALT_ACCS, CanBus, GMSafetyFlags
 from opendbc.car.interfaces import CarInterfaceBase, TorqueFromLateralAccelCallbackType, FRICTION_THRESHOLD, LatControlInputs, NanoFFModel
+from opendbc.car.values import PLATFORMS
 
 TransmissionType = structs.CarParams.TransmissionType
 NetworkLocation = structs.CarParams.NetworkLocation
@@ -210,11 +211,16 @@ class CarInterface(CarInterfaceBase):
 
     elif candidate == CAR.GMC_YUKON:
       ret.steerActuatorDelay = 0.2
-      CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
-      # ret.dashcamOnly = True  # Needs steerRatio, tireStiffness, and lat accel factor tuning
-
-    elif candidate == CAR.CHEVROLET_SUBURBAN:
-      ret.steerActuatorDelay = 0.2
+      # Suburban CAN fingerprint is a subset of Yukon (missing 528, 587, 848, 1355),
+      # so both fingerprint as GMC_YUKON. Detect Suburban here and apply its specs.
+      _SUBURBAN_ONLY_MSGS = {528, 587, 848, 1355}
+      is_suburban = not docs and not any(msg in fingerprint[CanBus.POWERTRAIN] for msg in _SUBURBAN_ONLY_MSGS)
+      if is_suburban:
+        suburban = PLATFORMS[CAR.CHEVROLET_SUBURBAN]
+        ret.mass = suburban.config.specs.mass
+        ret.wheelbase = suburban.config.specs.wheelbase
+        ret.centerToFront = suburban.config.specs.wheelbase * suburban.config.specs.centerToFrontRatio
+        ret.tireStiffnessFactor = suburban.config.specs.tireStiffnessFactor
       CarInterfaceBase.configure_torque_tune(candidate, ret.lateralTuning)
 
     return ret
