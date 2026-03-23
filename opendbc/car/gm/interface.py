@@ -216,6 +216,7 @@ class CarInterface(CarInterfaceBase):
       _SUBURBAN_ONLY_MSGS = {528, 587, 848, 1355}
       is_suburban = not docs and not any(msg in fingerprint[CanBus.POWERTRAIN] for msg in _SUBURBAN_ONLY_MSGS)
       if is_suburban:
+        ret.carFingerprint = CAR.CHEVROLET_SUBURBAN
         suburban = PLATFORMS[CAR.CHEVROLET_SUBURBAN]
         ret.mass = suburban.config.specs.mass
         ret.wheelbase = suburban.config.specs.wheelbase
