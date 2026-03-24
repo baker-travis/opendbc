@@ -98,12 +98,12 @@ static void gm_rx_hook(const CANPacket_t *to_push) {
 
 static bool gm_tx_hook(const CANPacket_t *to_send) {
   const TorqueSteeringLimits GM_STEERING_LIMITS = {
-    .max_steer = 400,
-    .max_rate_up = 15,
-    .max_rate_down = 25,
+    .max_steer = 550,
+    .max_rate_up = 20,
+    .max_rate_down = 30,
     .driver_torque_allowance = 65,
     .driver_torque_multiplier = 4,
-    .max_rt_delta = 171,
+    .max_rt_delta = 235,
     .max_rt_interval = 250000,
     .type = TorqueDriverLimited,
   };

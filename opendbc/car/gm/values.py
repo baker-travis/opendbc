@@ -36,9 +36,9 @@ class CarControllerParams:
 
   def __init__(self, CP):
     if CP.carFingerprint in self.HEAVY_TRUCK_CAR:
-      self.STEER_MAX = 400
-      self.STEER_DELTA_UP = 15
-      self.STEER_DELTA_DOWN = 25
+      self.STEER_MAX = 550
+      self.STEER_DELTA_UP = 20
+      self.STEER_DELTA_DOWN = 30
     # Gas/brake lookups
     self.ZERO_GAS = 2048  # Coasting
     self.MAX_BRAKE = 400  # ~ -4.0 m/s^2 with regen
